@@ -77,24 +77,12 @@ function kld_normal(e, p)
     # Σ_0 and Σ_1 are diagonal, so everything can be done element-wise
     μ0, logσ0 = μlogσ(e)
     μ1, logσ1 = μlogσ(p)
-    l =  oftype(μ0[1], 0)
-    @inbounds for i in eachindex(μ0)
-        l += (exp(2 * logσ0[i]) + (μ0[i]-μ1[i])^2) / (exp(2 * logσ1[i])) + 2 * logσ1[i] - 2 * logσ0[i] - 1
-    end
-    return l/2
+    sum(@. (exp(2 * logσ0) + (μ0-μ1)^2) / (exp(2 * logσ1)) + 2 * logσ1 - 2 * logσ0 - 1)
 end
 
 function mycrossentropy(d, y)
     μ, logσ = μlogσ(d)
-    normals = @. Normal(μ, exp(logσ))
-    #l = sum(@. logpdf(Normal(μ, exp(logσ)), y))
-    l = oftype(μ[1], 0)
-    @inbounds for j in 1:size(y,2)
-        @inbounds for i in 1:size(y,1)
-            l += logpdf.(normals[i], y[i, j])
-        end
-    end
-    return l
+    sum(@. logpdf(Normal(μ, exp(logσ)), y))
 end
 
 function step_loss(xi, yi, phi_x, phi_z, encoder, decoder, prior, hidden)

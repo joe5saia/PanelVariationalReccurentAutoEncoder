@@ -12,7 +12,7 @@ using DataFrames, CSV, LibPQ, Dates, Statistics, LinearAlgebra, Revise, StatsBas
 includet("pulldata_helper.jl")
 
 ## Uses password in pgpass file
-cstring = open("wrds_cstring.txt") do file
+cstring = open(".wrds_cstring.txt") do file
     read(file, String)
 end
 conn = LibPQ.Connection(cstring)
